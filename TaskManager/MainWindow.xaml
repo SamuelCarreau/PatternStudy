@@ -6,45 +6,54 @@
         xmlns:local="clr-namespace:PatternStudy.TaskManager"
         xmlns:converters="clr-namespace:TaskManager.Converters"
         xmlns:views="clr-namespace:TaskManager.Views"
+        xmlns:templateSelectors="clr-namespace:TaskManager.TemplateSelectors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <converters:BoolToStatusConverter x:Key="BoolToStatusConverter"/>
+        <templateSelectors:TodoItemTemplateSelector x:Key="TodoItemTemplateSelector"/>
+
+        <DataTemplate x:Key="ItemTemplate">
+            <Border BorderBrush="LightGray" BorderThickness="1" Padding="5" Margin="2">
+                    <StackPanel Orientation="Vertical">
+                        <!--Display Task Title-->
+                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" />
+
+                        <!--Display Task Description-->
+                        <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0" />
+
+                        <!--Display Due Date-->
+                        <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:MMM dd, yyyy}'}" FontSize="12" Foreground="Gray" Margin="0,2,0,0" />
+
+                        <!--Display Priority-->
+                        <TextBlock Text="{Binding Priority}" FontSize="12" Foreground="Blue" Margin="0,2,0,0" />
+
+                        <!--Display Completion Status-->
+                        <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BoolToStatusConverter}}" FontSize="12" Foreground="Green" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SelectedTemplate">
+            <views:TodoFormControl DataContext="{Binding .}"  />
+        </DataTemplate>
+
+        <Style TargetType="{x:Type ListBoxItem}" x:Key="ContainerStyle">
+            <Setter Property="ContentTemplate" Value="{StaticResource ItemTemplate}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="ContentTemplate" Value="{StaticResource SelectedTemplate}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Content="Add Task" Command="{Binding AddCommand}" Padding="10" Margin="10,0"/>
-        <ListView Grid.Row="1" ItemsSource="{Binding TodoItems}" SelectedItem="{Binding SelectedItem}"  Margin="10">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="LightGray" BorderThickness="1" Padding="5" Margin="2">
-                        <StackPanel Orientation="Vertical">
-                            <!-- Display Task Title -->
-                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="14" />
-
-                            <!-- Display Task Description -->
-                            <TextBlock Text="{Binding Description}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0" />
-
-                            <!-- Display Due Date -->
-                            <TextBlock Text="{Binding DueDate, StringFormat='Due: {0:MMM dd, yyyy}'}" FontSize="12" Foreground="Gray" Margin="0,2,0,0" />
-
-                            <!-- Display Priority -->
-                            <TextBlock Text="{Binding Priority}" FontSize="12" Foreground="Blue" Margin="0,2,0,0" />
-
-                            <!-- Display Completion Status -->
-                            <TextBlock Text="{Binding IsCompleted, Converter={StaticResource BoolToStatusConverter}}" FontSize="12" Foreground="Green" Margin="0,2,0,0" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <views:TodoFormControl Grid.Row="1" Grid.Column="1" />
+        <ListView Grid.Row="1" ItemsSource="{Binding TodoItems}" SelectedItem="{Binding SelectedItem}"  Margin="10" ItemContainerStyle="{StaticResource ContainerStyle}"/>
     </Grid>
 </Window>

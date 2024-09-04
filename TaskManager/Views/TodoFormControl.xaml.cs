@@ -23,6 +23,6 @@ namespace TaskManager.Views
         public TodoFormControl()
         {
             InitializeComponent();
-        }
+          }
     }
 }
